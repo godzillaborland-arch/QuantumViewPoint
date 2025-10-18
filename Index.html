@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sanctuary - Your Hub for Mindfulness, Travel, and Life</title>
+    <!-- Load Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import for a clean look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Soft off-white */
+        }
+        /* Custom scrollbar styling for aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9ca3af; /* Gray-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* Gray-500 */
+        }
+        .hero-bg {
+            background-image: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%); /* Deep Violet Gradient */
+        }
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-shadow:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+        }
+        /* Styles for the loading indicator */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #5B21B6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <!-- Tailwind Configuration for custom colors if needed -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-indigo': '#5B21B6', /* Deep Indigo */
+                        'accent-cyan': '#22D3EE',  /* Muted Teal/Cyan */
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="text-gray-800">
+
+    <!-- Header / Hero Section -->
+    <header class="hero-bg text-white p-6 md:p-12 rounded-b-xl shadow-2xl">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-3 tracking-tight">The Sanctuary</h1>
+            <p class="text-xl md:text-2xl font-light opacity-90 mb-6">
+                Cultivating inner peace, exploring the world, and sharing the journey.
+            </p>
+            <p class="text-sm opacity-75">
+                Find all my latest content, playlists, and projects here.
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8">
+
+        <!-- Section 1: Core Platforms (Primary CTA) -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-primary-indigo mb-8">Connect & Explore My Universe</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                
+                <!-- Blog Link -->
+                <a href="#blog-link-placeholder" class="card-shadow p-4 bg-white rounded-xl border-t-4 border-primary-indigo hover:border-accent-cyan flex flex-col items-center text-center">
+                    <!-- Icon: Book Open (Blog) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-indigo mb-1.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <h3 class="text-md md:text-xl font-semibold text-gray-900 mb-0">The Blog</h3>
+                    <p class="text-xs text-gray-500 hidden md:block">Spiritual deep dives</p>
+                </a>
+
+                <!-- YouTube Link -->
+                <a href="#youtube-link-placeholder" class="card-shadow p-4 bg-white rounded-xl border-t-4 border-red-600 hover:border-accent-cyan flex flex-col items-center text-center">
+                    <!-- Icon: Play Circle (YouTube) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 mb-1.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    <h3 class="text-md md:text-xl font-semibold text-gray-900 mb-0">Videos</h3>
+                    <p class="text-xs text-gray-500 hidden md:block">Guided meditations</p>
+                </a>
+
+                <!-- Spotify Link -->
+                <a href="#spotify-link-placeholder" class="card-shadow p-4 bg-white rounded-xl border-t-4 border-green-500 hover:border-accent-cyan flex flex-col items-center text-center">
+                    <!-- Icon: Music (Spotify) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mb-1.5"><path d="M9 18V5l-2 1V2"/><path d="M22 17V3l-3 1V2"/><path d="M12 18V5l-2 1V2"/></svg>
+                    <h3 class="text-md md:text-xl font-semibold text-gray-900 mb-0">Playlists</h3>
+                    <p class="text-xs text-gray-500 hidden md:block">Focus & Relaxation</p>
+                </a>
+
+                <!-- Contact Me Button (NEW) -->
+                <a href="mailto:your_email@example.com?subject=Inquiry%20from%20The%20Sanctuary%20Landing%20Page" class="card-shadow p-4 bg-white rounded-xl border-t-4 border-accent-cyan hover:border-primary-indigo flex flex-col items-center text-center">
+                    <!-- Icon: Mail -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent-cyan mb-1.5"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    <h3 class="text-md md:text-xl font-semibold text-gray-900 mb-0">Contact Me</h3>
+                    <p class="text-xs text-gray-500 hidden md:block">Send an email</p>
+                </a>
+            </div>
+            
+            <div class="mt-8 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-sm text-center">
+                <!-- Instruction Note -->
+                <p>⚠️ **ACTION REQUIRED:** Please replace the placeholder links (and the `mailto:` email address) with your actual URLs.</p>
+            </div>
+        </section>
+
+
+        <!-- Section 4: Interactive Q&A - Powered by Gemini (NEW) -->
+        <section class="mb-12 mt-16">
+            <h2 class="text-3xl font-bold text-center text-primary-indigo mb-6">Ask The Sanctuary</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+                Tap the button to get a concise, grounded answer on the essence of good meditation.
+            </p>
+
+            <div class="card-shadow p-6 bg-white rounded-xl border-2 border-primary-indigo">
+                <div class="flex flex-col items-center space-y-4">
+                    <button id="meditation-button" class="bg-primary-indigo hover:bg-purple-800 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 active:scale-100">
+                        Answer: What is your measure for good meditation?
+                    </button>
+                    
+                    <div id="loading-indicator" class="hidden flex items-center space-x-3 text-gray-600">
+                        <div class="spinner"></div>
+                        <span>Contemplating deep wisdom...</span>
+                    </div>
+
+                    <div id="meditation-answer" class="w-full mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <!-- Answer will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 2: Content Categorization (Existing, moved down slightly) -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-primary-indigo mb-8 mt-12">Latest Content by Theme</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- Spiritual / Meditation Card -->
+                <div class="card-shadow p-6 bg-white rounded-xl border-2 border-primary-indigo">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <!-- Icon: Lotus -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-indigo"><path d="M12 3v18l-9-9 9-9z"/><path d="M21 12l-9-9v18l9-9z"/><path d="M12 21l-9-9 9-9"/></svg>
+                        <h3 class="text-2xl font-bold text-primary-indigo">Spiritual Focus</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Blog: The Power of Intentional Silence (5 min read)</p>
+                                <span class="text-xs text-gray-500">Topic: Mindfulness Techniques</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">YouTube: 15-Minute Grounding Meditation (Video)</p>
+                                <span class="text-xs text-gray-500">Playlist: Daily Practice</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Spotify: Alpha Wave Sleep Playlist (Listen Now)</p>
+                                <span class="text-xs text-gray-500">Playlist: Deep Rest</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Travel Card -->
+                <div class="card-shadow p-6 bg-white rounded-xl border-2 border-blue-600">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <!-- Icon: Globe -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <h3 class="text-2xl font-bold text-blue-600">Travel & Explore</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Blog: Finding Stillness in Kyoto's Temples</p>
+                                <span class="text-xs text-gray-500">Destination: Japan</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">YouTube: Solo Backpacking through the Dolomites</p>
+                                <span class="text-xs text-gray-500">Video Series: Europe</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Spotify: Road Trip Indie Essentials (Playlist)</p>
+                                <span class="text-xs text-gray-500">Playlist: Adventure</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Personal Card -->
+                <div class="card-shadow p-6 bg-white rounded-xl border-2 border-pink-500">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <!-- Icon: Heart -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-pink-500"><path d="M19 14c-1.5 0-2.8-.7-3.8-1.7L12 10 8.8 12.3c-1 1-2.3 1.7-3.8 1.7-3.3 0-6-2.7-6-6s2.7-6 6-6c1.5 0 2.8.7 3.8 1.7L12 10l3.2-2.3c1-1 2.3-1.7 3.8-1.7 3.3 0 6 2.7 6 6s-2.7 6-6 6z"/></svg>
+                        <h3 class="text-2xl font-bold text-pink-500">Personal Musings</h3>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Blog: My Morning Routine for Creativity</p>
+                                <span class="text-xs text-gray-500">Topic: Productivity</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">YouTube: Q&A - Listener Questions on Balance</p>
+                                <span class="text-xs text-gray-500">Video: Community</span>
+                            </a>
+                        </li>
+                        <li class="border-b pb-2">
+                            <a href="#" class="block hover:text-accent-cyan transition duration-200">
+                                <p class="font-medium">Spotify: Lo-Fi Study Beats (Focus Music)</p>
+                                <span class="text-xs text-gray-500">Playlist: Personal Favorites</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Section 3: App Embed Showcase (HTML / Clade AI App) -->
+        <section class="mb-12 mt-16">
+            <h2 class="text-3xl font-bold text-center text-primary-indigo mb-6">Featured Project Showcase</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+                Check out my latest interactive project, app, or tool right here.
+            </p>
+
+            <div class="card-shadow p-6 bg-white rounded-xl border-2 border-accent-cyan">
+                <div class="text-center p-4 bg-primary-indigo text-white rounded-t-lg">
+                    <h3 class="text-xl font-semibold">Your Interactive App/Tool (HTML/Clade AI)</h3>
+                </div>
+                <!-- Iframe Container - Use this to embed your actual app -->
+                <iframe id="app-embed" 
+                    srcdoc="<h1 style='color:#5B21B6; text-align:center; padding: 50px;'>App Placeholder Ready!</h1><p style='text-align:center;'>To embed your custom HTML or Clade AI app, simply change the 'srcdoc' attribute of this iframe to your app's URL or raw HTML code.<br>Example: &lt;iframe src='https://your-app-link.com/app.html'&gt;..." 
+                    class="w-full h-96 border-4 border-dashed border-gray-300 rounded-b-lg mt-0"
+                    title="Interactive App Embed Placeholder"
+                ></iframe>
+                
+                <div class="mt-4 p-4 bg-cyan-50 border border-cyan-200 rounded-lg text-sm text-gray-700">
+                    <p class="font-semibold">🛠️ How to Embed Your App:</p>
+                    <p class="mt-1">
+                        Find the `<iframe id="app-embed"...>` code above. To showcase your app, you should:
+                        <br>1. **Option A (External App):** Change the `srcdoc` attribute to a `src="YOUR_APP_URL_HERE"` attribute, pointing to your live HTML or Clade AI app URL.
+                        <br>2. **Option B (Inline HTML):** Replace the placeholder HTML content in the `srcdoc="..."` attribute with the raw, complete HTML code of your smaller app.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="hero-bg text-white p-6 mt-12">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="text-sm mb-4 opacity-75">&copy; 2025 The Sanctuary | Designed for Mobile & QR Distribution</p>
+            <div class="flex justify-center space-x-6">
+                <a href="#blog" class="text-white hover:text-accent-cyan transition duration-200">Blog</a>
+                <a href="#contact" class="text-white hover:text-accent-cyan transition duration-200">Contact</a>
+                <!-- Social Media Icons (replace # with actual links) -->
+                <a href="#instagram-link" aria-label="Instagram" class="text-white hover:text-accent-cyan transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12 8a4 4 0 0 1 4 3.37z"/><line x1="17.5" x2="17.5" y1="6.5" y2="6.5"/></svg>
+                </a>
+                <a href="#twitter-link" aria-label="Twitter" class="text-white hover:text-accent-cyan transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2 1.3-1.4 2-3.2 2-5.4 0-1.2-.2-2.3-.6-3.4 3.1 1.7 5-4 5-4s-3.7-.8-5-1c-1.2-.2-2.4-.4-3.6-.5 1-.9 2.1-1.6 3.4-2.2 1.3-.6 2.7-.9 4.2-.9z"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Gemini API Configuration & Logic for Q&A Section ---
+
+        const apiKey = ""; // API Key is automatically provided by the Canvas environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        const button = document.getElementById('meditation-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const answerContainer = document.getElementById('meditation-answer');
+
+        // Function for robust fetching with exponential backoff
+        async function exponentialBackoffFetch(url, options, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return response;
+                    
+                    // Handle non-OK status codes for retrying specific errors
+                    if (response.status === 429 || response.status >= 500) {
+                        if (i < retries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                            continue;
+                        }
+                    }
+                    // Throw for unrecoverable errors like 400s
+                    throw new Error(`API request failed with status: ${response.status}`);
+
+                } catch (error) {
+                    if (i < retries - 1) {
+                        // Wait before retrying
+                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                        continue;
+                    }
+                    throw error;
+                }
+            }
+            throw new Error("API request failed after multiple retries.");
+        }
+
+        async function generateMeditationAnswer() {
+            button.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            answerContainer.classList.add('hidden');
+            answerContainer.innerHTML = '';
+
+            const systemPrompt = "You are 'The Sanctuary,' a warm, knowledgeable, and concise spiritual guide. Your goal is to answer the user's philosophical question with a single, clear paragraph of no more than 100 words. Frame the answer in terms of personal experience and verifiable concepts. Do not use markdown formatting (like bolding or lists) in the final answer.";
+            const userQuery = "What is your measure for good meditation?";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }], // Enable grounding for high-quality, up-to-date answer
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            try {
+                const response = await exponentialBackoffFetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    let sourcesHtml = '';
+                    const groundingMetadata = candidate.groundingMetadata;
+
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        const sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+
+                        if (sources.length > 0) {
+                            sourcesHtml = `
+                                <div class="mt-4 pt-2 border-t border-gray-200 text-xs text-gray-500">
+                                    <p class="font-semibold mb-1">Sources:</p>
+                                    <ul class="list-disc list-inside space-y-0.5">
+                                        ${sources.map(s => `<li><a href="${s.uri}" target="_blank" class="hover:underline">${s.title}</a></li>`).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    answerContainer.innerHTML = `
+                        <p class="text-gray-900 leading-relaxed font-medium">${text}</p>
+                        ${sourcesHtml}
+                    `;
+                    answerContainer.classList.remove('hidden');
+
+                } else {
+                    answerContainer.innerHTML = '<p class="text-red-500">Sorry, I couldn\'t generate an answer right now. Please try again later.</p>';
+                    answerContainer.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error generating meditation answer:", error);
+                answerContainer.innerHTML = '<p class="text-red-500">A network error occurred. Check your connection or try again.</p>';
+                answerContainer.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                button.disabled = false;
+            }
+        }
+
+        // Attach event listener to the button
+        document.addEventListener('DOMContentLoaded', () => {
+            if (button) {
+                button.addEventListener('click', generateMeditationAnswer);
+            }
+        });
+
+    </script>
+</body>
+</html>
