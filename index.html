@@ -300,124 +300,226 @@
         </div>
     </footer>
 
-    <script>
-        // --- Gemini API Configuration & Logic for Q&A Section ---
+    // This script is designed to be placed inside the existing <script> tag at the bottom of index.html
 
-        const apiKey = ""; // API Key is automatically provided by the Canvas environment
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+// --- 1. FIREBASE SETUP (For "Contribute Your Wisdom") ---
+
+// Configuration and initialization variables are expected to be available globally
+// We'll initialize them here for the sake of completeness, assuming they are provided.
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+let db = null;
+let auth = null;
+
+// Helper to convert Firebase config from string to object if needed, and initialize app
+const initFirebase = async () => {
+    try {
+        const app = firebase.initializeApp(firebaseConfig);
+        db = firebase.getFirestore(app);
+        auth = firebase.getAuth(app);
         
-        const button = document.getElementById('meditation-button');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const answerContainer = document.getElementById('meditation-answer');
+        firebase.setLogLevel('debug'); // Enable logging for debugging
 
-        // Function for robust fetching with exponential backoff
-        async function exponentialBackoffFetch(url, options, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) return response;
-                    
-                    // Handle non-OK status codes for retrying specific errors
-                    if (response.status === 429 || response.status >= 500) {
-                        if (i < retries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-                            continue;
-                        }
-                    }
-                    // Throw for unrecoverable errors like 400s
-                    throw new Error(`API request failed with status: ${response.status}`);
-
-                } catch (error) {
-                    if (i < retries - 1) {
-                        // Wait before retrying
-                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
-                        continue;
-                    }
-                    throw error;
-                }
-            }
-            throw new Error("API request failed after multiple retries.");
+        // Sign in anonymously or with custom token
+        if (initialAuthToken) {
+            await firebase.signInWithCustomToken(auth, initialAuthToken);
+        } else {
+            await firebase.signInAnonymously(auth);
         }
+        
+        const userId = auth.currentUser ? auth.currentUser.uid : 'anonymous-user';
+        console.log(`Firebase authenticated. User ID: ${userId}`);
 
-        async function generateMeditationAnswer() {
-            button.disabled = true;
-            loadingIndicator.classList.remove('hidden');
-            answerContainer.classList.add('hidden');
-            answerContainer.innerHTML = '';
+        // Start listening for responses immediately after authentication
+        loadResponses(userId);
+    } catch (error) {
+        console.error("Error initializing Firebase or authentication:", error);
+        document.getElementById('wisdom-wall').innerHTML = `<p class="text-red-500">Could not connect to database. Please check console for errors.</p>`;
+    }
+};
 
-            const systemPrompt = "You are 'The Sanctuary,' a warm, knowledgeable, and concise spiritual guide. Your goal is to answer the user's philosophical question with a single, clear paragraph of no more than 100 words. Frame the answer in terms of personal experience and verifiable concepts. Do not use markdown formatting (like bolding or lists) in the final answer.";
-            const userQuery = "What is your measure for good meditation?";
+// --- 2. FIRESTORE DATA HANDLING ---
 
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                tools: [{ "google_search": {} }], // Enable grounding for high-quality, up-to-date answer
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-            };
+const saveResponse = async () => {
+    const input = document.getElementById('meditation-measure');
+    const measure = input.value.trim();
+    
+    if (!db || !auth || !measure) {
+        if (!measure) console.error("Input field is empty.");
+        if (!db || !auth) console.error("Database or Auth not initialized.");
+        document.getElementById('wisdom-message').textContent = 'Error: Cannot submit data. Please ensure the page is fully loaded.';
+        return;
+    }
 
-            try {
-                const response = await exponentialBackoffFetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+    const userId = auth.currentUser ? auth.currentUser.uid : crypto.randomUUID(); // Use UID if authenticated, or random ID
 
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
+    try {
+        // Path: /artifacts/{appId}/public/data/meditation_measures
+        const collectionPath = `artifacts/${appId}/public/data/meditation_measures`;
+        
+        await firebase.addDoc(firebase.collection(db, collectionPath), {
+            measure: measure,
+            userId: userId,
+            timestamp: firebase.serverTimestamp()
+        });
+        
+        input.value = ''; // Clear input on success
+        document.getElementById('wisdom-message').textContent = 'Wisdom shared successfully!';
 
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    let sourcesHtml = '';
-                    const groundingMetadata = candidate.groundingMetadata;
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        document.getElementById('wisdom-message').textContent = `Submission failed: ${e.message}`;
+    }
+};
 
-                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                        const sources = groundingMetadata.groundingAttributions
-                            .map(attribution => ({
-                                uri: attribution.web?.uri,
-                                title: attribution.web?.title,
-                            }))
-                            .filter(source => source.uri && source.title);
+const loadResponses = (currentUserId) => {
+    const wall = document.getElementById('wisdom-wall');
+    wall.innerHTML = '<p class="text-gray-500">Loading collective wisdom...</p>';
 
-                        if (sources.length > 0) {
-                            sourcesHtml = `
-                                <div class="mt-4 pt-2 border-t border-gray-200 text-xs text-gray-500">
-                                    <p class="font-semibold mb-1">Sources:</p>
-                                    <ul class="list-disc list-inside space-y-0.5">
-                                        ${sources.map(s => `<li><a href="${s.uri}" target="_blank" class="hover:underline">${s.title}</a></li>`).join('')}
-                                    </ul>
-                                </div>
-                            `;
-                        }
-                    }
+    try {
+        const collectionPath = `artifacts/${appId}/public/data/meditation_measures`;
+        const q = firebase.query(firebase.collection(db, collectionPath));
+        
+        // Listen for real-time updates
+        firebase.onSnapshot(q, (snapshot) => {
+            const responses = [];
+            snapshot.forEach((doc) => {
+                responses.push(doc.data());
+            });
 
-                    answerContainer.innerHTML = `
-                        <p class="text-gray-900 leading-relaxed font-medium">${text}</p>
-                        ${sourcesHtml}
-                    `;
-                    answerContainer.classList.remove('hidden');
-
-                } else {
-                    answerContainer.innerHTML = '<p class="text-red-500">Sorry, I couldn\'t generate an answer right now. Please try again later.</p>';
-                    answerContainer.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error generating meditation answer:", error);
-                answerContainer.innerHTML = '<p class="text-red-500">A network error occurred. Check your connection or try again.</p>';
-                answerContainer.classList.remove('hidden');
-            } finally {
-                loadingIndicator.classList.add('hidden');
-                button.disabled = false;
+            // Sort responses by timestamp (newest first, since we can't use orderBy)
+            responses.sort((a, b) => {
+                const timeA = a.timestamp?.toMillis() || 0;
+                const timeB = b.timestamp?.toMillis() || 0;
+                return timeB - timeA;
+            });
+            
+            if (responses.length === 0) {
+                wall.innerHTML = '<p class="text-gray-500">Be the first to share your wisdom!</p>';
+                return;
             }
-        }
 
-        // Attach event listener to the button
-        document.addEventListener('DOMContentLoaded', () => {
-            if (button) {
-                button.addEventListener('click', generateMeditationAnswer);
-            }
+            wall.innerHTML = responses.map(data => {
+                // Display the full user ID for multi-user apps (as per guidelines)
+                const isYou = data.userId === currentUserId ? ' (You)' : '';
+                return `
+                    <div class="p-3 bg-indigo-50 border-l-4 border-cyan-500 rounded-md">
+                        <p class="text-gray-700">${data.measure}</p>
+                        <p class="text-xs text-gray-500 mt-1">Shared by: ${data.userId}${isYou}</p>
+                    </div>
+                `;
+            }).join('');
+        }, (error) => {
+            console.error("Error listening to Firestore:", error);
+            wall.innerHTML = `<p class="text-red-500">Error loading data: ${error.message}</p>`;
         });
 
+    } catch (e) {
+        console.error("Error setting up snapshot listener:", e);
+        wall.innerHTML = `<p class="text-red-500">Failed to initialize data listener.</p>`;
+    }
+};
+
+// --- 3. GEMINI API CALL (For "Ask The Sanctuary") ---
+
+const getGeminiResponse = async () => {
+    const button = document.getElementById('ask-button');
+    const outputDiv = document.getElementById('gemini-output');
+    const originalText = button.textContent;
+
+    if (button.disabled) return;
+    
+    button.disabled = true;
+    button.textContent = 'Seeking Wisdom...';
+    outputDiv.innerHTML = '<p class="text-gray-500">Processing the query...</p>';
+
+    const userQuery = "What is a good measure for successful meditation, covering spiritual and neurological aspects?";
+    const systemPrompt = "Act as a compassionate and knowledgeable spiritual guide and neuroscience enthusiast. Provide a concise, single-paragraph answer that synthesizes both subjective (spiritual) and objective (neurological) measures of effective meditation.";
+    const apiKey = ""; 
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+    const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        tools: [{ "google_search": {} }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+    };
+
+    // Implemented basic retry logic for robustness
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (text) {
+                outputDiv.innerHTML = `<p class="text-gray-700 font-medium leading-relaxed">${text}</p>`;
+                break; // Success, exit loop
+            } else {
+                throw new Error("API response text was empty.");
+            }
+
+        } catch (error) {
+            console.error(`Attempt ${attempt + 1} failed:`, error);
+            if (attempt === 2) { // Last attempt failed
+                outputDiv.innerHTML = '<p class="text-red-500">Sorry, the Sanctuary is currently unreachable. Please try again later.</p>';
+            }
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000)); // Exponential backoff
+        }
+    }
+    
+    button.textContent = originalText;
+    button.disabled = false;
+};
+
+// --- 4. INITIALIZATION ---
+
+// Add event listeners to the buttons
+const setupListeners = () => {
+    document.getElementById('share-wisdom-button')?.addEventListener('click', saveResponse);
+    document.getElementById('ask-button')?.addEventListener('click', getGeminiResponse);
+};
+
+// Start the entire process after the window loads
+window.onload = function() {
+    setupListeners();
+    initFirebase();
+};
+
+```
+
+### Instructions to Fix Your File
+
+1.  **Open your `index.html` file on GitHub** (the one that is currently working and displaying the purple header).
+2.  Scroll to the very bottom, where you will see this existing `<script>` tag:
+
+    ```html
+    <script>
+        // Placeholder for future JavaScript/API logic.
+        // If you were seeing a script here, DELETE its contents and replace it with the code below.
     </script>
+    ```
+
+3.  **Replace the contents of that `<script>` block with the entire `javascript` code block I just gave you.**
+
+4.  **Add the necessary Firebase library imports.** You will need to add the following lines *above* your `<script>` tag, right before the closing `</body>` tag:
+
+    ```html
+    <!-- FIREBASE DEPENDENCIES -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+    
 </body>
 </html>
+
